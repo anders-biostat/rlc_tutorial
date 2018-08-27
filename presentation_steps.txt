@@ -1,0 +1,48 @@
+Tutorial:
+
+- CiteSeq data: describe, show paper
+- Subset to human cells
+- Calculate count sums (and size factors)
+- Plot variance versus mean
+- then plot var/mean vs mean
+
+- How to individual genes look like?
+- Let's pick a gene with 'identify', then plot it's counts against the countsums
+- How can we automatize this?
+
+- Linked charts: Installation from github
+- Open a page (use_viewer=FALSE)
+- place a simple scatter plot, var/mean vs mean
+- set log scale
+- adjust point size
+- demonstrate on_click
+
+- Set a 'gene' global variable to some random gene, e.g. "CD3E"
+- Add a second scatter plot to plot counts for gene versus countsum
+- Make x axis logarithmic
+- Add title=gene
+
+- Set layout to 'table2x2'
+- Place at "A1" and "A2"
+
+- Demonstrate changing the plot: Change the 'gene' variable, then call updateChart
+
+- Now put this into on_click for the first plot.
+
+- Play with it: What kind of data can we see?
+
+- Recap!
+
+- Add t-SNE
+- add colourValue parameter to t-SNE
+- add t-SNE to update call
+- add sqrt to colourValue
+
+- Show 'getMarked'
+- Use it to color genes in a t-SNE plot in R
+- Use it to calculate mean differences
+
+- Show rlc/test2  
+
+- Show t-SNE vs UMAP
+
