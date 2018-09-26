@@ -273,6 +273,80 @@ keep the code as is in order to be able to reevaluate it whenever needed. (In ot
 function without arguments, but does so in a manner that allows for a ligh, unobstructive syntax.)
 
 
+## Adding a t-SNE plot
+
+So far, our app demonstrated well the principle of using R/LinkedChart, but practitioners of single-cell transcriptomics might still find it unconvincing. Hence, let's add a bit more to make it actually useful.
+
+In single-cell RNA-Seq, one often employs dimension reduction methods, such as [t-SNE](https://lvdmaaten.github.io/tsne/). These produce a plot with points representing the cells such that cells with similar transcriptome are closeby.
+
+Let's use the `Rtsne` package to calculate a t-SNE plot for our expression data.
+
+```r
+install.packages( "Rtsne" )   # if needed
+
+library( Rtsne )
+
+# Normalize the counts by dividing by the size factors and take the square root
+# (The square root stabilizes the variance; please see our write-up on 
+# this [under preparation] for details, if you are interested.)
+expr <- apply( countMatrix, 2, function( x ) sqrt( x / sf ) )
+
+# Calculate the t-SNE embedding. This may take a while.
+tsne <- Rtsne( expr )
+
+# Delete the 'expr' matrix again, as it takes up a lot of memory.
+rm( expr )
+```
+
+The embedding is in the `Y` field of the object returned by `Rtsne`.
+We display it with a third scatter plot:
+
+```r
+lc_scatter(
+  dat( 
+    x = tsne$Y[,1], 
+    y = tsne$Y[,2], 
+    colourValue = sqrt( countMatrix[ gene, ] / sf ),
+    palette = RColorBrewer::brewer.pal( 9, "YlOrRd" ),
+    size = 1,
+  "B1"
+)
+```
+
+This plot is now placed a position "B1", i.e., under A1. We use the two columns of the
+2x*N* matrix in `tsne$Y` for x and y. Each data point represents a cell, and we use
+the points' colours to indicate the expression strength of the currently selected gene.
+To this end, we read the corresponding row from the countMatrix the same way as we
+did to get `y` in chart B1, but now also normalize by dividing by the size factors. Furthermore,
+we take teh square root; this is not really necessary but results in a more even use of the 
+colour palette. 
+
+For the colour palette, we set the parameter `palette`. We have to provide a vector of colours, and
+LinkedCharts will interpolate between these. Here, we have used the "YlOrRd" (for "Yellow-Orange-Red")
+palette provided by the RColorBrewer package.
+
+Note how it easy it is again to link this chart with the existing ones. If the use clicks on a point
+on chart A1 to select a gene, the `gene` variable will be changed and this will affect what data is
+shown now in both the charts A2 and B1. The only thing that is missing is that we need to change
+the even handler in A1 to also update B2. So, we simply add this to the call to `updateChart` above.
+
+```r
+...
+    on_click = function( i ) {
+       gene <<- rownames(countMatrix)[ i ]
+       updateChart( c( "A2", "B1" ) )
+    }
+...
+```
+
+Have a look [here](LINK_MISSING) for the final code, if you are unsure how this fits in.
+
+Play a bit with the app. Now you can easily find out for any gene with high variability whether it is
+expressed throughout, or whether is is specific to one of the clusters visible in the t-SNE embedding.
+This will help us to understand the t-SNE plot.
+
+## 
+
 
 ## What else is there?
 
@@ -299,6 +373,11 @@ to `openPage` and to mark the places where the charts should go with `id` tags (
 to make beautiful apps with little work.
 
 - If you want a web app that runs independent of R, you can use plain LinkedCharts instead of R/LinkedCharts. You have to write in JavaScript instead of in R, but you only have know enough to load the data and write code as simple as what we have written in R above.
+
+
+## Where to find more information
+
+**[TO DO: Links to further documentation go here.]**
 
 
 ## Some of the ideas behind R/LinkedCharts
