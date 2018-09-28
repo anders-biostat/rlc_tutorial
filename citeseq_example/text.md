@@ -86,11 +86,13 @@ means <- apply( countMatrix, 1, function(x) mean( x / sf ) )
 vars <- apply( countMatrix, 1, function(x) var( x / sf ) )
 ```
 
-We save these variable into a file, to be used later
+We save these variable into an R data file, to be used later
 
 ```r
 save( countMatrix, sf, means, vars, file = "citeseq_data.rda" )
 ```
+
+If you want to skip over preceeding steps, you can also just load this R data file from [here](https://github.com/anders-biostat/rlc_tutorial/blob/master/citeseq_example/citeseq_data.rda?raw=true).
 
 ## Analysis the old-fashioned way
 
@@ -280,7 +282,7 @@ So far, our app demonstrated well the principle of using R/LinkedChart, but prac
 
 In single-cell RNA-Seq, one often employs dimension reduction methods, such as [t-SNE](https://lvdmaaten.github.io/tsne/). These produce a plot with points representing the cells such that cells with similar transcriptome are closeby.
 
-Let's use the `Rtsne` package to calculate a t-SNE plot for our expression data. (The t-SNE calculation takes a few minutes. If you don't like to wait, just load the [`citeseq_data.rda`](MISSING) file, which contains the result.)
+Let's use the `Rtsne` package to calculate a t-SNE plot for our expression data. (The t-SNE calculation takes a few minutes. If you don't like to wait, just load the [`citeseq_data.rda`](https://github.com/anders-biostat/rlc_tutorial/blob/master/citeseq_example/citeseq_data.rda?raw=true) file, which contains the result.)
 
 ```r
 install.packages( "Rtsne" )   # if needed
@@ -347,7 +349,7 @@ lc_scatter(
 )
 ```
 
-Have a look [here](LINK_MISSING) for the final code, if you are unsure how this fits in.
+Have a look below for the final code, if you are unsure how this fits in.
 
 Play a bit with the app. Now you can easily find out for any gene with high variability whether it is
 expressed throughout, or whether is is specific to one of the clusters visible in the t-SNE embedding.
@@ -488,7 +490,7 @@ showHighGenes <- function( marked ) {
 }
 ```
 
-## Everything put togetehr
+## Everything put together
 
 In case you got lost with the individual pieces of code, here is everything put together
 
@@ -496,13 +498,14 @@ In case you got lost with the individual pieces of code, here is everything put 
 library( rlc )
 
 # Load the prepared data. You can get this file from here:
-# http://...[TODO: INSERT LINK]
+# https://github.com/anders-biostat/rlc_tutorial/blob/master/citeseq_example/citeseq_data.rda?raw=true
 load( "citeseq.rda" )
 
 openPage( layout = "table2x2", useViewer=FALSE )
 
 gene <- "CD79A"
 
+# the variance-mean overview plot (A1)
 lc_scatter(
   dat( 
     x = means, 
@@ -517,6 +520,7 @@ lc_scatter(
   "A1"
 )
 
+# the expression of the selected gene (A2)
 lc_scatter(
   dat( 
     x = sf, 
@@ -527,6 +531,7 @@ lc_scatter(
   "A2"
 )
 
+# the t-SNE plot (B1)
 lc_scatter(
   dat(
     x = tsne$Y[,1],
@@ -540,6 +545,8 @@ lc_scatter(
   "B1"
 )
 
+# the function to find genes high in the selected cells that
+# writes its result to the table in B2
 showHighGenes <- function( marked ){
   
   # If no genes are marked, clear output, do nothing else
