@@ -27,7 +27,7 @@ fileName <- "~/Downloads/GSE100866_CBMC_8K_13AB_10X-RNA_umi.csv.gz"
 countMatrix <- as.matrix( read.csv( gzfile( fileName ), row.names = 1) )
 ```
 
-Stoecklin \textit{et al.}\ have spiked in a few mouse cells to their human cord blood sample for quality
+Stoecklin et al. have spiked in a few mouse cells to their human cord blood sample for quality
 control purposes, and have therefore mapped everything against both the human and the mouse genome.
 We keep only the cells with nearly only human transcripts and also remove the mouse gene counts from
 the data matrix.
