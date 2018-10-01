@@ -273,8 +273,8 @@ How does it work? The call to `updateChart` causes
 all the code within the `dat` function of chart A2 to be re-evaluated, and then, the new data to be sent to the browser. As `gene` has changed, the re-evaluation of the code in the `dat` call will now give different values to `y` and to
 `title`, and the plot changes. This is why all the plot parameters (means, vars, etc.) have to be placed inside the `dat` call:
 The `dat` function is a little trick to keep R from evaluating this code straight away when you call lc_scatter but rather to
-keep the code as is in order to be able to reevaluate it whenever needed. (In other word, `dat` just defines an anonymous
-function without arguments, but does so in a manner that allows for a ligh, unobstructive syntax.)
+keep the code as is in order to be able to reevaluate it whenever needed. (In other words, `dat` just defines an anonymous
+function without arguments, but does so in a manner that allows for a light, unobstructive syntax.)
 
 
 ## Adding a t-SNE plot
@@ -291,15 +291,15 @@ install.packages( "Rtsne" )   # if needed
 library( Rtsne )
 
 # Normalize the counts by dividing by the size factors and take the square root
-# (The square root stabilizes the variance; please see our write-up on 
-# this [under preparation] for details, if you are interested.)
+# (The square root stabilizes the variance more robustly than the logarithm;
+# please see our write-up on this [under preparation] if you are interested.)
 expr <- t( apply( countMatrix, 1, function( x ) sqrt( x / sf ) ) )
 
 # Get the names of the 1000 genes with the highest variance-to-mean ratios
 varGenes <- names( tail( sort( vars/means ), 1000 ) )
 
 # Calculate the t-SNE embedding. This may take a while.
-tsne <- Rtsne( t( expr[,varGenes], verbose = TRUE ) )
+tsne <- Rtsne( t( expr[varGenes, ] ), verbose = TRUE )
 
 ```
 
@@ -331,7 +331,7 @@ palette provided by the RColorBrewer package.
 Note how it easy it is again to link this chart with the existing ones. If the use clicks on a point
 on chart A1 to select a gene, the `gene` variable will be changed and this will affect what data is
 shown now in both the charts A2 and B1. The only thing that is missing is that we need to change
-the even handler in A1 to also update B2. So, we simply add this to the call to `updateChart` above.
+the event handler in A1 to also update B2. So, we simply add this to the `updateChart` call from above:
 
 ```r
 lc_scatter(
@@ -354,11 +354,11 @@ Have a look [here](LINK_MISSING) for the final code, if you are unsure how this 
 
 Play a bit with the app. Now you can easily find out for any gene with high variability whether it is
 expressed throughout, or whether is is specific to one of the clusters visible in the t-SNE embedding.
-This will help us to understand the t-SNE plot.
+This will help us to conveniently explore and understand the t-SNE plot.
 
 ## Analysing marked cells
 
-Mark one of the cell cluster in the t-SNE plot by drawing a rectangle with the mouse while holding the Shift key. (Drawing without Shift causes zooming in rather than selecting). You can unselect all cells by holding Shift and double-clicking. (Double-clicking without Shift undoes any zooms and returns to the original axis limits.)
+Mark one of the cell clusters in the t-SNE plot by drawing a rectangle with the mouse while holding the Shift key. (Drawing without Shift causes zooming in rather than selecting). You can unselect all cells by holding Shift and double-clicking. (Double-clicking without Shift undoes any zooms and returns to the original axis limits.)
 
 After marking cells in the browser, you can go right back to your R session and inquire about them using the `getMarked` function.
 
@@ -376,9 +376,9 @@ Here are the indices of the 147 cells that I have just marked:
 [141]  975 1034 1465 1911 5803 7975 7996
 ```
 
-Thet are all from the same small cluster at the periphery of the t-SNE plot. What genes might be especially strong in
+They are all from the same small cluster at the periphery of the t-SNE plot. What genes might have particularly high expression in
 this cluster? To see, let's calculate, for each gene, mean and standard deviation first over all the marked cells and
-then over all the remaining cells. To save time, let's to it only for the informative genes that we have selected above 
+then over all the remaining cells. To save time, let's do it only for the informative genes that we have selected above 
 and stored in the variable `varGenes`.
 
 ```r
@@ -390,10 +390,11 @@ df <- data.frame(
 )
 ```
 
-Now, we can calculate, for each gene, a separation score which tells us how well the distribution of this gene's expression
-values in the marked cells is separated from the distribution in the unmarked cells. It's a bit like a z score: We
+Now, we can calculate a separation score for each gene, which tells us how well the distribution of this gene's expression
+values in the marked cells is separated from the distribution in the unmarked cells. It's a bit like a z-score: We
 take the difference of the means between marked and unmarked, and divide by the standard deviations (which we simply
-add up). And if the standard deviations are extremely small, and would blow up the value to much, we fudge it by
+add up for both groups). Notably, if the standard deviations are extremely small they blow up the score too much; we circumvent
+this by 
 setting a minimum value of 0.002. Not a very sophisticated approach, but it works well enough for this demonstration.
 
 ```r 
@@ -439,18 +440,18 @@ html_table <- hwriter::hwrite( head( df[ order( df$sepScore, decreasing=TRUE ), 
 [1] "<table border=\"1\">\n<tr>\n<td></td><td>meanMarked</td><td>sdMarked</td><td>meanUnmarked</td><td>sdUnmarked</td><td>sepScore</td></tr>\n<tr>\n<td>PRSS57</td><td>0.725066676278626</td><td>0.369053339059246</td><td>0.0126227362973354</td><td>0.103636705089765</td><td>1.5072116470401</td></tr>\n<tr>\n<td>SPINK2</td><td>0.831003575054457</td><td>0.493962176122786</td><td>0.013138822891984</td><td>0.0946902014959639</td><td>1.38938494646186</td></tr>\n<tr>\n<td>C1QTNF4</td><td>0.620767250693636</td><td>0.467230715177914</td><td>0.000949666672459759</td><td>0.024628474625193</td><td>1.26015249256457</td></tr>\n<tr>\n<td>STMN1</td><td>1.04197366701963</td><td>0.366123080494962</td><td>0.157104208312422</td><td>0.351029833213004</td><td>1.23386441272627</td></tr>\n<tr>\n<td>C17orf76-AS1</td><td>2.09242035687478</td><td>0.308443407217987</td><td>1.01179390598515</td><td>0.598994096952368</td><td>1.19085495797048</td></tr>\n<tr>\n<td>KIAA0125</td><td>0.609764572553002</td><td>0.42878392946118</td><td>0.00956672439381324</td><td>0.0883721856290961</td><td>1.16057382025622</td></tr>\n</table>\n"
 ```
 
-This is not very readable any more but become quite readable once we put it into our web app, and let 
+This cryptic line will become nice and readable once we put it into our web app to let 
 the web browser interpret the HTML code:
 
 ```r
 lc_html( html_table , "B2" )
 ```
-The moment you write this, the table appears on the web page.
+The moment your R executes this line, the table appears on the web page.
 
 How can we make this automatic, so that all this happens whenever we mark a group of cells? Simple: We just have to write
-an event handle, this time `markedUpdated` rather than `on_click`.
+an event handler again, only this time we use `markedUpdated` rather than `on_click`.
 
-We hence add such an event handler to the t-SNE plot:
+Let's add such an event handler to the t-SNE plot:
 
 ```r
 lc_scatter(
