@@ -27,7 +27,7 @@ fileName <- "~/Downloads/GSE100866_CBMC_8K_13AB_10X-RNA_umi.csv.gz"
 countMatrix <- as.matrix( read.csv( gzfile( fileName ), row.names = 1) )
 ```
 
-Stoecklin et al.\ have spiked in a few mouse cells to their human cord blood sample for quality
+Stoecklin \textit{et al.}\ have spiked in a few mouse cells to their human cord blood sample for quality
 control purposes, and have therefore mapped everything against both the human and the mouse genome.
 We keep only the cells with nearly only human transcripts and also remove the mouse gene counts from
 the data matrix.
@@ -78,7 +78,7 @@ consider them as comparable after dividing them by their respective size factors
 sf <- colSums(countMatrix) / 1000
 ```
 
-For our first example, we will ask whcih genes actually differ in an inmteresting way from cell to cell.
+For our first example, we will ask which genes actually differ in an interesting way from cell to cell.
 To this end, we calculate for each gene the mean and variance of the normalized counts
 
 ```r
@@ -107,7 +107,7 @@ abline( h = mean( 1/sf ),
 ![](var_mean_simple.png)
 
 All the genes that are scattering close to the red line have no or only little signal:
-the Poisson noise dominated over any biological signal of interest that may there be.
+the Poisson noise dominates over any biological signal of interest that may there be.
 Only the genes that are clearly above the red line can convey useful information.
 
 (To understand why the red line marks the expected strength of Poisson noise, and why it
@@ -142,6 +142,7 @@ Now, we show how to create such linked charts with R/LinkedCharts.
 
 If you haven't done so yet, install the R/LinkedChart package with
 ```r
+devtools::install_github( "anders-biostat/JsRCom" ) # required for rlc
 devtools::install_github( "anders-biostat/rlc" )
 ```
 
@@ -176,7 +177,7 @@ of 10. Note how all the parameters are wrapped in a call to a function named `da
 
 The second parameter ("`place`") specifies where to put the plot on the page: here, at position `A1`, i.e., top left.
 
-We will explain further details below; before, we add the second plot:
+We will explain more details further below; but first, let's add the second plot:
 
 ```r
 gene <- "CD79A"
@@ -194,11 +195,12 @@ lc_scatter(
 
 As before, we have used `lc_scatter` to insert a scatter plot, now at position `A2` (to the right of `A1`). As before,
 we use the vector `sf` for the `x` axis, and one row of `countMatrix` for the `y` axis. The variable `gene` contains
-the rowname of the row to display. We also use two further optional parameters: `title` sets the plot title and maked
-the gene name (as stored in the variable `gene`) appear above the chart, and `opacity = 0.2` renders the points semi-transparent, so that we can better see whether several points are sitting on top of each other.
+the rowname of the row to display. We also use two further optional parameters: `title` sets the plot title above the chart
+(in this case the gene name, as stored in the variable `gene`), and `opacity = 0.2` renders the points semi-transparent, so
+that we can better see whether several points are sitting on top of each other.
 
-Now, we need to *link* the two charts. When the user clicks on a point in the left chart (chart A1), then the value of the variable `gene` should be changed to the name of the gene onto which the user has clicked. If we then cause the second chart (A2) to be redrawn, it will show the data for that gene. To explain to R/LinkedChart that thsi should happen
-when the user clicks on a data point, we change the code for the firts chart to the following:
+Now, we need to *link* the two charts. When the user clicks on a point in the left chart (chart A1), then the value of the variable `gene` should be changed to the name of the gene onto which the user has clicked. If we then cause the second chart (A2) to be redrawn, it will show the data for that gene. To explain to R/LinkedChart that this should happen
+when the user clicks on a data point, we change the code for the first chart to the following:
 
 ```r
 lc_scatter(
@@ -222,7 +224,7 @@ to a function. This function will now be called whenever the user clicks on a po
 simply look up the name of the gene as the `i`-th rowname of count matrix and write this into the variable. 
 
 Note that
-we assign to the variable `gene` using the `<<-` operator. This variant of the usual `<` (or `=`) operator assigns to
+we assign to the variable `gene` using the `<<-` operator. This variant of the usual `<-` (or `=`) operator assigns to
 a global rather than a local variable. Had we used the normal `<-`, R would have created a local variable called `gene`
 within the function and forgot it immediatly afterwards, rather than changing the global variable that we had defined before.
 
