@@ -271,7 +271,8 @@ lc_scatter(
 
 How does it work? The call to `updateChart` causes
 all the code within the `dat` function of chart A2 to be re-evaluated, and then, the new data to be sent to the browser. As `gene` has changed, the re-evaluation of the code in the `dat` call will now give different values to `y` and to
-`title`, and the plot changes. This is why all the plot parameters have to be placed inside the `dat` call: The `dat` function is a little trick to keep R from evaluating this code straight away when you call lc_scatter but rather to
+`title`, and the plot changes. This is why all the plot parameters (means, vars, etc.) have to be placed inside the `dat` call:
+The `dat` function is a little trick to keep R from evaluating this code straight away when you call lc_scatter but rather to
 keep the code as is in order to be able to reevaluate it whenever needed. (In other word, `dat` just defines an anonymous
 function without arguments, but does so in a manner that allows for a ligh, unobstructive syntax.)
 
