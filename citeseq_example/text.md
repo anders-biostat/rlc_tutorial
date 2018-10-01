@@ -458,7 +458,7 @@ lc_scatter(
   dat(
     x = tsne$Y[,1],
     y = tsne$Y[,2],
-    colourValue = sqrt( counts[ gene, ] / sf ),
+    colourValue = sqrt( countMatrix[ gene, ] / sf ),
     palette = RColorBrewer::brewer.pal( 9, "YlOrRd" ),
     size = 1,
     markedUpdated = function() {
@@ -503,6 +503,7 @@ library( rlc )
 # http://...[TODO: INSERT LINK]
 load( "citeseq.rda" )
 
+
 openPage( layout = "table2x2", useViewer=FALSE )
 
 gene <- "CD79A"
@@ -524,7 +525,7 @@ lc_scatter(
 lc_scatter(
   dat( 
     x = sf, 
-    y = counts[ gene, ], 
+    y = countMatrix[ gene, ], 
     logScaleX = 10, 
     title = gene,
     opacity = 0.2 ),
@@ -535,7 +536,7 @@ lc_scatter(
   dat(
     x = tsne$Y[,1],
     y = tsne$Y[,2],
-    colourValue = sqrt( counts[ gene, ] / sf ),
+    colourValue = sqrt( countMatrix[ gene, ] / sf ),
     palette = RColorBrewer::brewer.pal( 9, "YlOrRd" ),
     size = 1,
     markedUpdated = function() {
