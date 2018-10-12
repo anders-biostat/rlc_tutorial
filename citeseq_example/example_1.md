@@ -8,6 +8,8 @@ We will develop an interactive app that produces, from less than a page of R cod
 
 While the screenshot above is just a picture, the code when run in R, will produce an interactive app, where clicking on one point will change the displayed charts.
 
+Readers in a hurry can download the final script [here](example_1_complete.R), and run it as is in R. Of course, you will have to read on to see what the different charts are supposed to show.
+
 ## Example data
 
 As example data, we use single-cell transcriptomics data from the "CiteSeq" paper (Stoeckius et al., *Simultaneous epitope and transcriptome measurement in single cells*, [Nature Methods, 14:865](https://doi.org/10.1038/nmeth.4380), 2017). This paper describes a new method to simultaneously measure the transcriptome as well as the "epitome" (the abundance of selected surface markers) of single cells, using droplet sequencing. They demonstrate it with a 
@@ -502,82 +504,8 @@ showHighGenes <- function( marked ) {
 
 ## Everything put together
 
-In case you got lost with the individual pieces of code, here is everything put together
+In case you got lost with the individual pieces of code, [here](example_1_complete.R) is everything put together.
 
-```r
-library( rlc )
-
-# Load the prepared data. You can get this file from here:
-# https://github.com/anders-biostat/rlc_tutorial/blob/master/citeseq_example/citeseq_data.rda?raw=true
-load( "citeseq_data.rda" )
-
-
-openPage( layout = "table2x2", useViewer=FALSE )
-
-gene <- "CD79A"
-
-# the variance-mean overview plot (A1)
-lc_scatter(
-  dat( 
-    x = means, 
-    y = vars / means,
-    logScaleX=10, 
-    logScaleY=10, 
-    size=2.5,
-    on_click = function(i) {
-      gene <<- names(means)[i]
-      updateChart( c( "A2", "B1" ) )
-    } ), 
-  "A1"
-)
-
-# the expression of the selected gene (A2)
-lc_scatter(
-  dat( 
-    x = sf, 
-    y = countMatrix[ gene, ], 
-    logScaleX = 10, 
-    title = gene,
-    opacity = 0.2 ),
-  "A2"
-)
-
-# the t-SNE plot (B1)
-lc_scatter(
-  dat(
-    x = tsne$Y[,1],
-    y = tsne$Y[,2],
-    colourValue = sqrt( countMatrix[ gene, ] / sf ),
-    palette = RColorBrewer::brewer.pal( 9, "YlOrRd" ),
-    size = 1,
-    markedUpdated = function() {
-       showHighGenes( getMarked( "B1" ) )
-    }),
-  "B1"
-)
-
-# the function to find genes high in the selected cells that
-# writes its result to the table in B2
-showHighGenes <- function( marked ){
-  
-  # If no genes are marked, clear output, do nothing else
-  if( length(marked) == 0 ) {
-    lc_html( "", "B2" )
-    return()
-  }
-
-  df <- data.frame(
-    meanMarked   =  apply( expr[ varGenes,  marked ], 1, mean ),
-    sdMarked     =  apply( expr[ varGenes,  marked ], 1, sd ),
-    meanUnmarked =  apply( expr[ varGenes, -marked ], 1, mean ),
-    sdUnmarked   =  apply( expr[ varGenes, -marked ], 1, sd )
-  )
-  df$sepScore <- ( df$meanMarked - df$meanUnmarked ) / pmax( df$sdMarked + df$sdUnmarked, 0.002 )
-
-  html_table <- hwriter::hwrite( head( df[ order( df$sepScore, decreasing=TRUE ), ] ) )
-  lc_html( html_table , "B2" )
-}
-```
 
 ## What else is there?
 
