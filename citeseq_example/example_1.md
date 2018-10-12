@@ -2,6 +2,12 @@
 
 This tutorial demonstrates how our R/LinkedCharts package can be used to created linked scatter charts. 
 
+We will develop an interactive app that produces, from less than a page of R code, this here:
+
+![](example_1_screenshot.png)
+
+While the screenshot above is just a picture, the code when run in R, will produce an interactive app, where clicking on one point will change the displayed charts.
+
 ## Example data
 
 As example data, we use single-cell transcriptomics data from the "CiteSeq" paper (Stoeckius et al., *Simultaneous epitope and transcriptome measurement in single cells*, [Nature Methods, 14:865](https://doi.org/10.1038/nmeth.4380), 2017). This paper describes a new method to simultaneously measure the transcriptome as well as the "epitome" (the abundance of selected surface markers) of single cells, using droplet sequencing. They demonstrate it with a 
@@ -92,7 +98,7 @@ We save these variable into an R data file, to be used later
 save( countMatrix, sf, means, vars, file = "citeseq_data.rda" )
 ```
 
-If you want to skip over preceeding steps, you can also just load this R data file from [here](https://github.com/anders-biostat/rlc_tutorial/blob/master/citeseq_example/citeseq_data.rda?raw=true).
+If you want to skip over preceding steps, you can also just load this R data file from [here](https://github.com/anders-biostat/rlc_tutorial/blob/master/citeseq_example/citeseq_data.rda?raw=true).
 
 ## Analysis the old-fashioned way
 
@@ -129,7 +135,7 @@ plot( sf, countMatrix[ gene, ],
 
 ![](CD79A_simple.png)
 
-But where is gene "CD79A" on the previos plot? And, given a specific point on the overview plot (the first one), how can
+But where is gene "CD79A" on the previous plot? And, given a specific point on the overview plot (the first one), how can
 we quickly get the detail plot (the second one)?
 
 Here we can click on a point in the left chart, to change what is displayed in the right plot:
@@ -173,7 +179,7 @@ in the "Viewer" pane of RStudio (for `useViewer=TRUE`, the default). We have cho
 window, as the viewer pane is a bit small to show two plots side by side. As layout for our charts, we 
 use a simple 2x2 grid, with four chart positions labelled "A1", "A2", "B1", and "B2".
 
-The `lc_scatter` function inserts a scatter plot. The first argument sepcifies values for the plots parameters. Unsurpisingly, we have to pass two vectors with x and y coordinates of the points, and furthermore, we specify
+The `lc_scatter` function inserts a scatter plot. The first argument sepcifies values for the plots parameters. Unsurprisingly, we have to pass two vectors with x and y coordinates of the points, and furthermore, we specify
 a few more optional parameters: Both axes should be logarithmic, with tic marks labelling multiples
 of 10. Note how all the parameters are wrapped in a call to a function named `dat`. This will be explained later.
 
@@ -228,7 +234,7 @@ simply look up the name of the gene as the `i`-th rowname of count matrix and wr
 Note that
 we assign to the variable `gene` using the `<<-` operator. This variant of the usual `<-` (or `=`) operator assigns to
 a global rather than a local variable. Had we used the normal `<-`, R would have created a local variable called `gene`
-within the function and forgot it immediatly afterwards, rather than changing the global variable that we had defined before.
+within the function and forgot it immediately afterwards, rather than changing the global variable that we had defined before.
 
 After changing the variable, we simply instruct R/LinkedCharts to update chart A2: `updateChart( "A2" )`. 
 
@@ -275,7 +281,7 @@ How does it work? The call to `updateChart` causes
 all the code within the `dat` function of chart A2 to be re-evaluated, and then, the new data to be sent to the browser. As `gene` has changed, the re-evaluation of the code in the `dat` call will now give different values to `y` and to
 `title`, and the plot changes. This is why all the plot parameters (means, vars, etc.) have to be placed inside the `dat` call:
 The `dat` function is a little trick to keep R from evaluating this code straight away when you call lc_scatter but rather to
-keep the code as is in order to be able to reevaluate it whenever needed. (In other words, `dat` just defines an anonymous
+keep the code as is in order to be able to re-evaluate it whenever needed. (In other words, `dat` just defines an anonymous
 function without arguments, but does so in a manner that allows for a light, unobstructive syntax.)
 
 
@@ -324,7 +330,7 @@ This plot is now placed a position "B1", i.e., under A1. We use the two columns 
 2x*N* matrix in `tsne$Y` for x and y. Each data point represents a cell, and we use
 the points' colours to indicate the expression strength of the currently selected gene.
 To this end, we read the corresponding row from the `expr` matrix that we have also used to
-calulate the t-SNE plot.
+calculate the t-SNE plot.
 
 For the colour palette, we set the parameter `palette`. We have to provide a vector of colours, and
 LinkedCharts will interpolate between these. Here, we have used the "YlOrRd" (for "Yellow-Orange-Red")
@@ -503,7 +509,7 @@ library( rlc )
 
 # Load the prepared data. You can get this file from here:
 # https://github.com/anders-biostat/rlc_tutorial/blob/master/citeseq_example/citeseq_data.rda?raw=true
-load( "citeseq.rda" )
+load( "citeseq_data.rda" )
 
 
 openPage( layout = "table2x2", useViewer=FALSE )
